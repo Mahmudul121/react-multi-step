@@ -1,10 +1,28 @@
 .home-wrapper {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  h1 {
-    font-size: 50px;
-    line-height: 55px;
-    text-align: center;
+  background: var(--white);
+  min-height: 100vh;
+}
+
+.multi-step-block {
+  padding: 20px;
+  .tab-wrapper {
+    border: none;
+    margin-bottom: 20px;
+    .nav-item {
+      .nav-link {
+        border: none;
+        color: #b6b3b3;
+        &.active {
+          border-bottom: 4px solid #0079b8;
+          color: #0079b8;
+          font-weight: 600;
+        }
+        &:hover {
+          color: #0079b8;
+          font-weight: 600;
+          // border-bottom: 4px solid #0079b8;
+        }
+      }
+    }
   }
 }
