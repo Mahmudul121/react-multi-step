@@ -1,9 +1,26 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Container } from "react-bootstrap";
 import Table from "react-bootstrap/Table";
 import Button from "../../components/ui/Button";
 
+import { useLocation, useNavigate } from "react-router-dom";
+import { toastify } from "../../components/ui/Toast";
+
 const Result = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [resultData, setResultData] = useState([]);
+
+  useEffect(() => {
+    console.log(location.state);
+    if (location.state?.data) {
+      setResultData(location.state?.data);
+    } else {
+      toastify("error", "Please submit data first.");
+      navigate("/");
+    }
+    // eslint-disable-next-line
+  }, [location.state]);
   const handleClickPDF = () => {
     console.log("asd");
   };
@@ -22,10 +39,10 @@ const Result = () => {
           </thead>
           <tbody>
             <tr>
-              <td>test</td>
-              <td>Mark</td>
-              <td>Otto</td>
-              <td>sdf</td>
+              <td>{resultData?.project_name ?? "-"}</td>
+              <td>{resultData?.client ?? "-"}</td>
+              <td>{resultData?.contractor ?? "-"}</td>
+              <td>{resultData?.project_description ?? "-"}</td>
             </tr>
           </tbody>
         </Table>
@@ -43,17 +60,18 @@ const Result = () => {
           </thead>
           <tbody>
             <tr>
-              <td>2</td>
-              <td>2</td>
-              <td>2</td>
-              <td>2</td>
-              <td>2</td>
-              <td>2</td>
+              <td>{resultData?.max_x ?? "-"}</td>
+              <td>{resultData?.min_x ?? "-"}</td>
+              <td>{resultData?.max_y ?? "-"}</td>
+              <td>{resultData?.min_y ?? "-"}</td>
+              <td>{resultData?.max_z ?? "-"}</td>
+              <td>{resultData?.min_z ?? "-"}</td>
             </tr>
           </tbody>
         </Table>
         <div className="my-5 text-center">
           <Button
+            disabled={resultData?.length}
             onClick={() => handleClickPDF()}
             className="w-50 mt-4"
             type={"button"}

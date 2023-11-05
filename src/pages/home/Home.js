@@ -10,13 +10,19 @@ import Table from "react-bootstrap/Table";
 
 // hook form
 import { Controller, useForm } from "react-hook-form";
-const Home = () => {
-  const [activeTab, setActiveTab] = useState("step_1");
+import { toastify } from "../../components/ui/Toast";
+// react router
+import { useNavigate } from "react-router-dom";
 
+const Home = () => {
+  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState("step_1");
+  const allowedExtensions = ["csv"];
   const {
     handleSubmit,
     control,
     setValue,
+    getValues,
     formState: { errors },
   } = useForm();
 
@@ -25,11 +31,85 @@ const Home = () => {
   };
   const onSubmit = (data) => {
     console.log(data);
+    navigate("/result", { state: { data: data } });
+  };
+  // error on submit
+  const onError = (e) => {
+    if (
+      e?.project_name ||
+      e?.project_description ||
+      e?.client ||
+      e?.contractor
+    ) {
+      toastify("warn", "Please fill step 1 data.");
+      setActiveTab("step_1");
+    }
+  };
+
+  const uploadCSV = async (e) => {
+    if (e.target.files) {
+      try {
+        const file = e.target.files[0];
+
+        const fileExtension = file?.type.split("/")[1];
+        if (!allowedExtensions.includes(fileExtension)) {
+          toastify("error", "Please input a csv file");
+          return;
+        }
+
+        // 1. create url from the file
+        const fileUrl = URL.createObjectURL(file);
+
+        // 2. use fetch API to read the file
+        const response = await fetch(fileUrl);
+
+        // 3. get the text from the response
+        const text = await response.text();
+
+        // 4. split the text by newline
+        const lines = text.split("\n");
+
+        // 5. map through all the lines and split each line by comma.
+        const _data = lines.map((line) => line.split(","));
+
+        // 6. call the onChange event
+        toastify("success", "File upload succesfully");
+        const getXValues = _data
+          .slice(1, _data.length - 1)
+          .map((row) => parseFloat(row[1]));
+        // console.log();
+        // x value
+        const minX = Math.min(...getXValues);
+        const maxX = Math.max(...getXValues);
+        // y value
+        const getYValues = _data
+          .slice(1, _data.length - 1)
+          .map((row) => parseFloat(row[2]));
+        const minY = Math.min(...getYValues);
+        const maxY = Math.max(...getYValues);
+        // z value
+        const getZValues = _data
+          .slice(1, _data.length - 1)
+          .map((row) => parseFloat(row[3]));
+        const minZ = Math.min(...getZValues);
+        const maxZ = Math.max(...getZValues);
+        // set VALUE
+        setValue("min_x", minX);
+        setValue("max_x", maxX);
+        setValue("min_y", minY);
+        setValue("max_y", maxY);
+        setValue("min_z", minZ);
+        setValue("max_z", maxZ);
+      } catch (error) {
+        toastify("error", error);
+        console.error(error);
+      }
+    }
   };
   return (
     <div className="app-layout">
       <Container className="home-wrapper multi-step-block">
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={handleSubmit(onSubmit, onError)}>
           <Tabs
             activeKey={activeTab}
             onSelect={(key) => handleClickNext(key)}
@@ -56,6 +136,8 @@ const Home = () => {
                         fieldType="textField"
                         type="text"
                         name="project_name"
+                        placeholder=""
+                        // placeholder="Enter project name"
                         label="Project Name*"
                         error={errors?.project_name?.message}
                       />
@@ -76,6 +158,8 @@ const Home = () => {
                         fieldType="textField"
                         type="text"
                         name="client"
+                        placeholder=""
+                        // placeholder="Enter client name"
                         label="Client*"
                         error={errors?.client?.message}
                       />
@@ -96,6 +180,8 @@ const Home = () => {
                         fieldType="textField"
                         type="text"
                         name="contractor"
+                        placeholder=""
+                        // placeholder="Enter contractor name"
                         label="Contractor*"
                         error={errors?.contractor?.message}
                       />
@@ -115,6 +201,8 @@ const Home = () => {
                         type="textarea"
                         name="project_description"
                         label="Project Description*"
+                        placeholder=""
+                        // placeholder="Enter description"
                         row={4}
                         value={value}
                         onChange={onChange}
@@ -149,10 +237,10 @@ const Home = () => {
                     </thead>
                     <tbody>
                       <tr>
-                        <td>test</td>
-                        <td>Mark</td>
-                        <td>Otto</td>
-                        <td>sdf</td>
+                        <td>{getValues("project_name") ?? "-"}</td>
+                        <td>{getValues("client") ?? "-"}</td>
+                        <td>{getValues("contractor") ?? "-"}</td>
+                        <td>{getValues("project_description") ?? "-"}</td>
                       </tr>
                     </tbody>
                   </Table>
@@ -165,7 +253,11 @@ const Home = () => {
                 <Col xs={12}>
                   <Form.Group controlId="formFile" className="mb-3">
                     <Form.Label>Upload CSV file:</Form.Label>
-                    <Form.Control type="file" accept=".csv" />
+                    <Form.Control
+                      type="file"
+                      accept=".csv"
+                      onChange={(e) => uploadCSV(e)}
+                    />
                   </Form.Group>
                 </Col>
                 {/* x axis */}
@@ -183,6 +275,8 @@ const Home = () => {
                         fieldType="textField"
                         type="number"
                         name="max_x"
+                        placeholder=""
+                        // placeholder="Enter MAX X"
                         label="Max X*"
                         error={errors?.max_x?.message}
                       />
@@ -203,6 +297,8 @@ const Home = () => {
                         fieldType="textField"
                         type="number"
                         name="min_x"
+                        placeholder=""
+                        // placeholder="Enter MIN X"
                         label="Min X*"
                         error={errors?.min_x?.message}
                       />
@@ -224,6 +320,8 @@ const Home = () => {
                         fieldType="textField"
                         type="number"
                         name="max_y"
+                        placeholder=""
+                        // placeholder="Enter MAX Y"
                         label="Max Y*"
                         error={errors?.max_y?.message}
                       />
@@ -244,6 +342,8 @@ const Home = () => {
                         fieldType="textField"
                         type="number"
                         name="min_y"
+                        placeholder=""
+                        // placeholder="Enter MIN Y"
                         label="Min Y*"
                         error={errors?.min_y?.message}
                       />
@@ -265,6 +365,8 @@ const Home = () => {
                         fieldType="textField"
                         type="number"
                         name="max_z"
+                        placeholder=""
+                        // placeholder="Enter MAX Z"
                         label="Max Z*"
                         error={errors?.max_z?.message}
                       />
@@ -285,6 +387,8 @@ const Home = () => {
                         fieldType="textField"
                         type="number"
                         name="min_z"
+                        placeholder=""
+                        // placeholder="Enter MIN Z"
                         label="Min Z*"
                         error={errors?.min_z?.message}
                       />
