@@ -1,15 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Container } from "react-bootstrap";
 import Table from "react-bootstrap/Table";
-import Button from "../../components/ui/Button";
 
 import { useLocation, useNavigate } from "react-router-dom";
 import { toastify } from "../../components/ui/Toast";
 
 // pdf
-import ReactPDF, {
+import {
   PDFDownloadLink,
-  PDFViewer,
   Page,
   Text,
   View,

@@ -13,10 +13,12 @@ import { Controller, useForm } from "react-hook-form";
 import { toastify } from "../../components/ui/Toast";
 // react router
 import { useNavigate } from "react-router-dom";
+import ChartView from "../../components/ui/ChartView";
 
 const Home = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("step_1");
+  const [csvData, setCSVData] = useState([]);
   const allowedExtensions = ["csv"];
   const {
     handleSubmit,
@@ -93,6 +95,17 @@ const Home = () => {
           .map((row) => parseFloat(row[3]));
         const minZ = Math.min(...getZValues);
         const maxZ = Math.max(...getZValues);
+        // merge array
+        // Combine the two arrays
+        const mergedArray = _data.slice(1, _data.length - 1).map((row) => {
+          return {
+            x: parseFloat(row[1]),
+            y: parseFloat(row[2]),
+          };
+        });
+
+        // Set the combinedArray using the state updater function
+        setCSVData(mergedArray);
         // set VALUE
         setValue("min_x", minX);
         setValue("max_x", maxX);
@@ -106,6 +119,7 @@ const Home = () => {
       }
     }
   };
+  // console.log(csvData);
   return (
     <div className="app-layout">
       <Container className="home-wrapper multi-step-block">
@@ -259,6 +273,9 @@ const Home = () => {
                       onChange={(e) => uploadCSV(e)}
                     />
                   </Form.Group>
+                </Col>
+                <Col xs={12}>
+                  {csvData?.length > 0 ? <ChartView data={csvData} /> : null}
                 </Col>
                 {/* x axis */}
                 <Col md={6}>
