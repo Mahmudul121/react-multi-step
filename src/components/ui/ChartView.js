@@ -13,12 +13,13 @@ const ChartView = (props) => {
     datasets: [
       {
         label: "KP value X,Y",
+        // set value from csv
         data: props.data,
         backgroundColor: "rgb(255, 99, 132)",
       },
     ],
   };
-  console.log(props.data);
+  //   console.log(props.data);
   return <Scatter options={options} data={data} />;
 };
 

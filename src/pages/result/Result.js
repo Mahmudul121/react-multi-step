@@ -15,6 +15,7 @@ import {
   StyleSheet,
 } from "@react-pdf/renderer";
 
+// pdf css
 const styles = StyleSheet.create({
   page: {
     flexDirection: "row",
@@ -53,8 +54,9 @@ const Result = () => {
   const navigate = useNavigate();
   const [resultData, setResultData] = useState([]);
 
+  // check data
   useEffect(() => {
-    console.log(location.state);
+    // console.log(location.state);
     if (location.state?.data) {
       setResultData(location.state?.data);
     } else {
@@ -63,7 +65,7 @@ const Result = () => {
     }
     // eslint-disable-next-line
   }, [location.state]);
-  console.log(resultData, resultData?.length);
+  // console.log(resultData, resultData?.length);
   return (
     <div className="app-layout result-page">
       <Container>

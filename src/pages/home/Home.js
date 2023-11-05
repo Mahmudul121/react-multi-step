@@ -20,6 +20,7 @@ const Home = () => {
   const [activeTab, setActiveTab] = useState("step_1");
   const [csvData, setCSVData] = useState([]);
   const allowedExtensions = ["csv"];
+  // react hook form
   const {
     handleSubmit,
     control,
@@ -28,9 +29,11 @@ const Home = () => {
     formState: { errors },
   } = useForm();
 
+  // active tab
   const handleClickNext = (type) => {
     setActiveTab(type);
   };
+  // form submit
   const onSubmit = (data) => {
     console.log(data);
     navigate("/result", { state: { data: data } });
@@ -48,6 +51,7 @@ const Home = () => {
     }
   };
 
+  // read csv file
   const uploadCSV = async (e) => {
     if (e.target.files) {
       try {
